@@ -1,6 +1,6 @@
-interface iGenre {
-id:number,
-name:string
+interface IGenre {
+  id: number;
+  name: string;
 }
 
-export type {iGenre}
+export type { IGenre };

@@ -10,8 +10,10 @@ class FilmsAPI {
   }
 
   getGenres() {
-   return this.axiosConfig().get<IGetGenresResponseType>(`/genre/movie/list?api_key=${this.#apiKey}&language=en-US`)
-}
+    return this.axiosConfig().get<IGetGenresResponseType>(
+      `/genre/movie/list?api_key=${this.#apiKey}&language=en-US`
+    );
+  }
 }
 
 export const filmsAPI = new FilmsAPI();
