@@ -1,15 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getGenresThunk } from "../../../store/slices/genresSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { Button, Box, Typography } from "@mui/material";
+import { changeText } from "../../../store/slices/filmSlice";
 
 const Header = () => {
   const dispatch = useAppDispatch();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const { isPending, genres } = useAppSelector((state) => state.genresData);
+  const { searchText } = useAppSelector((state) => state.filmsData);
 
   useEffect(() => {
     dispatch(getGenresThunk());
   }, []);
+
+  useEffect(() => {
+    if (searchText.length >= 2) {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  }, [searchText]);
 
   return (
     <Box
@@ -34,6 +46,22 @@ const Header = () => {
       >
         Film API
       </Typography>
+      <Box>
+        <input
+          value={searchText}
+          onChange={(e) => dispatch(changeText(e.target.value))}
+          placeholder="Search film"
+          style={{
+            fontSize: "20px",
+            padding: "10px 20px",
+            borderRadius: "20px",
+            maxWidth: "400px",
+            width: "100%",
+            outline: "none",
+          }}
+        
+        />
+      </Box>
       <Box
         sx={{
           display: "flex",
