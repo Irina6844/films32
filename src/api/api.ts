@@ -31,8 +31,13 @@ class FilmsAPI {
       `search/movie?api_key=${this.#apiKey}&query=${text}`
     );
   }
+
+  getGenreMovies(genreId:number, page:number) {
+    return this.axiosConfig().get<IGetFilmsList>(
+      `/discover/movie?api_key=${this.#apiKey}&language=en-US&with_genres=${genreId}&page=${page}`
+    )
+  }
 }
 
 export const filmsAPI = new FilmsAPI();
 
-//

@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { getGenresThunk } from "../../../store/slices/genresSlice";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { Button, Box, Typography } from "@mui/material";
-import { changeText } from "../../../store/slices/filmSlice";
+import { Button, Box, Typography, Select, MenuItem } from "@mui/material";
+import {
+  changeGenre,
+  changeText,
+  getGenreMovieThunk,
+} from "../../../store/slices/filmSlice";
 
 const Header = () => {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { isPending, genres } = useAppSelector((state) => state.genresData);
-  const { searchText } = useAppSelector((state) => state.filmsData);
+  const { searchText, selectedGenre } = useAppSelector(
+    (state) => state.filmsData
+  );
 
   useEffect(() => {
     dispatch(getGenresThunk());
@@ -23,14 +29,18 @@ const Header = () => {
     }
   }, [searchText]);
 
+  const handleGenreClick = (genreId: number) => {
+    dispatch(changeGenre(genreId));
+    dispatch(getGenreMovieThunk({ genreId, page: 1 }));
+  };
   return (
     <Box
       sx={{
         backgroundColor: "#1d2b4dff",
         padding: "16px 24px",
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
+        // flexDirection: "column",
+        justifyContent: "space-between",
         alignItems: "center",
         gap: "12px",
       }}
@@ -46,6 +56,50 @@ const Header = () => {
       >
         Film API
       </Typography>
+      <Select
+        value={selectedGenre ?? 0}
+        sx={{
+          color: "#fff",
+          ".MuiOutlinedInput-notchedOutline": {
+            borderColor: "#fff",
+            transition: "all 0.3s",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#fff",
+          },
+
+          ".MuiSvgIcon-root": { color: "#fff" },
+        }}
+        onChange={(e) => handleGenreClick(Number(e.target.value))}
+      >
+        <MenuItem value={0}>All Genres </MenuItem>
+        {genres.map((genre) => (
+          <MenuItem
+            key={genre.id}
+            value={genre.id}
+            className="genersButton"
+            sx={{
+              borderColor: "#1976d2",
+              color: "black",
+              borderRadius: "0 30px 0 30px",
+              textTransform: "capitalize",
+              transition: "all 0.3s ease",
+              padding: "6px 14px",
+              fontWeight: "700",
+              fontSize: "20px",
+
+              "&:hover": {
+                backgroundColor: "#1976d2",
+                color: "#fff",
+                borderColor: "#1976d2",
+                fontWeight: "700",
+              },
+            }}
+          >
+            {genre.name}
+          </MenuItem>
+        ))}
+      </Select>
       <Box>
         <input
           value={searchText}
@@ -59,7 +113,6 @@ const Header = () => {
             width: "100%",
             outline: "none",
           }}
-        
         />
       </Box>
       <Box
@@ -71,9 +124,12 @@ const Header = () => {
           flexWrap: "wrap",
         }}
       >
-        {genres.map((genre) => (
+        {/* {
+        genres.map((genre) => (
+          
           <Button
             key={genre.id}
+            onClick={() => handleGenreClick(genre.id)}
             variant="outlined"
             className="genersButton"
             sx={{
@@ -96,7 +152,8 @@ const Header = () => {
           >
             {genre.name}
           </Button>
-        ))}
+        ))
+        } */}
       </Box>
     </Box>
   );

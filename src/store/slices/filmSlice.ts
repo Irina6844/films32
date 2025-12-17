@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import { filmsAPI } from "../../api/api";
 import type { IFilm } from "../../shared/types";
+import type { IGetFilmsList } from "../../api/api.types";
 
 export const getFilmsListThunk = createAsyncThunk<IGetFilmsListReturnType,number>("getFilmsListThunk", 
   async (page) => {
@@ -18,6 +19,14 @@ export const getOneFilmThunk = createAsyncThunk<IFilm, number> (
   }
 )
 
+export const getGenreMovieThunk = createAsyncThunk<IGetFilmsList,{ genreId: number; page: number }>(
+  'getGenreMovieThunk',
+  async({genreId,  page}) => {
+const response = await filmsAPI.getGenreMovies(genreId, page)
+return response.data
+  }
+)
+
 interface IGetFilmsListReturnType {
   page: number;
   results: Array<IFilm>;
@@ -31,6 +40,7 @@ interface IFilmsStateType {
   totalPages: number;
   searchText:string,
   selectedFilm?: IFilm
+  selectedGenre?:number
 }
 
 const initialState: IFilmsStateType = {
@@ -39,6 +49,7 @@ const initialState: IFilmsStateType = {
   totalPages: 1,
   searchText:'',
   selectedFilm: undefined,
+   selectedGenre:undefined
 };
 
 const filmsSlice = createSlice({
@@ -51,6 +62,10 @@ const filmsSlice = createSlice({
 
     changeText(state, action) {
 state.searchText = action.payload
+    },
+
+    changeGenre(state, action :PayloadAction <number | undefined>) {
+      state.selectedGenre=action.payload
     }
   },
   extraReducers(builder) {
@@ -62,8 +77,12 @@ state.searchText = action.payload
     .addCase(getOneFilmThunk.fulfilled, (state, action) => {
       state.selectedFilm = action.payload
     })
+    .addCase(getGenreMovieThunk.fulfilled, (state, action) => {
+      state.films=action.payload.results
+  
+    })
   },
 });
 
-export const { changePage, changeText } = filmsSlice.actions;
+export const { changePage, changeText, changeGenre } = filmsSlice.actions;
 export default filmsSlice.reducer;
